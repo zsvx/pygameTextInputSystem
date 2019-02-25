@@ -1,0 +1,125 @@
+# if not size 14 font, change where a black rect is drawn to match your pixel and font size
+# when calling: string = get_input(ypos)
+
+import pygame
+
+# define the screen
+width = 1000
+height = 1000
+gameDisplay = pygame.display.set_mode((width, height))
+
+# define colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+# only these two lists and any other key given an action will be shown
+alpha = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+         "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+beta = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+
+
+def get_input(ypos, user_input=""):
+    char_pos = 0  # increases by one after anything is typed
+    capspress = False  # true when keydown capslock or left shift held
+    while True:
+        # print(isdown)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_CAPSLOCK or event.key == pygame.K_LSHIFT:  # controls caps
+                    capspress = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_CAPSLOCK or event.key == pygame.K_LSHIFT:  # controls caps
+                    capspress = True
+                # clears text and returns result
+                elif event.key == pygame.K_RETURN:
+                    pygame.draw.rect(gameDisplay, black,
+                                     (0, ypos, 19 * char_pos * 7, 19), 0)
+                    return user_input
+                # removes last character from string and blacks out last character on screen
+                elif event.key == pygame.K_BACKSPACE:
+                    user_input = user_input[:-1]
+                    pygame.draw.rect(gameDisplay, black,
+                                     ((char_pos - 1) * 7, ypos, 19, 19), 0)
+                    char_pos -= 1
+                    pygame.display.update()
+                # only accepts letters
+                elif pygame.key.name(event.key) in alpha:
+                    if char_pos * 7 >= width - 5:  # does nothing if cursor at the end of the screen
+                        pass
+                    elif char_pos * 7 <= width - 5:  # displays character if not
+                        stringy = caps(pygame.key.name(event.key), capspress)
+                        text('Consolas', stringy,
+                             14, ((char_pos * 7), ypos), white)
+                        pygame.display.update()
+                        user_input += pygame.key.name(event.key)
+                        char_pos += 1
+                # only accepts numbers
+                elif pygame.key.name(event.key) in beta:
+                    if char_pos * 7 >= width - 5:  # does nothing if cursor at the end of the screen
+                        pass
+                    elif char_pos * 7 <= width - 5:  # displays character if not
+                        text('Consolas', pygame.key.name(event.key),
+                             14, ((char_pos * 7), ypos), white)
+                        pygame.display.update()
+                        user_input += pygame.key.name(event.key)
+                        char_pos += 1
+                else:
+                    # inserts a space in string and on screen
+                    if event.key == pygame.K_SPACE:
+                        if char_pos * 7 >= width - 5:  # does nothing if cursor at the end of the screen
+                            pass
+                        elif char_pos * 7 <= width - 5:  # displays character if not
+                            user_input += " "
+                            char_pos += 1
+                            text('Consolas', ' ',
+                                 14, ((char_pos * 7), ypos), white)
+
+
+def caps(s, capspress):
+    if capspress:  # if Lshift is held or caps down, uppercase that character
+        return(s.upper())
+    else:
+        return(s)  # if not, don't
+
+
+def text(font, content, size, pos, colour):  # sets up fonts
+    sys_font = pygame.font.SysFont(str(font), size)
+    text_surface = sys_font.render(str(content), False, colour)
+    gameDisplay.blit(text_surface, pos)
+
+# comment out if importing into another module
+
+# right here ^^^ to
+
+
+def main():  # copy and paste into your project
+    pygame.init()
+    pygame.font.init()
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        gameDisplay.fill(black)
+        test()
+        pygame.display.update()
+        clock.tick(5)
+
+
+def test():  # test function
+    text('Consolas', 'What is your name?', 14, (0, 0), white)
+    pygame.display.update()
+    while True:
+        name = get_input(20)  # increment by 20 each new line
+        if name.lower() == 'matthew'.lower():
+            text('Consolas', 'Same!', 14, (0, 20), white)
+        pygame.display.update()
+
+
+if __name__ == "__main__":  # if the primary function, run. not needed
+    main()
+
+# right here ^^^
